@@ -6,11 +6,11 @@ const userController = express.Router();
 // route for fetching data
 userController.get("/", async (req, res) => {
   const users = await userModel.find();
-  res.send(users);
+  res.send({ profiles: users });
 });
 
 // route for posting data
-userController.post("/post", async (req, res) => {
+userController.post("/", async (req, res) => {
   const { name, no, email, hobbies } = req.body;
   console.log(name, no, email, hobbies);
   const profile = new userModel({
@@ -24,12 +24,18 @@ userController.post("/post", async (req, res) => {
 });
 
 //route for updating data
+userController.patch("/", async (req, res) => {
+  const { id } = req.headers;
+  const { name, email, no, hobbies } = req.body;
+  await userModel.findByIdAndUpdate(id, { name, email, no, hobbies });
+  res.send("Updated !");
+});
 
 //route for deleting data
-userController.delete("/delete", async (req, res) => {
-  const { id } = req.body;
+userController.delete("/", async (req, res) => {
+  const { id } = req.headers;
   const user = await userModel.findOne({ id });
-  userModel.filter((el) => el.id !== user.id);
+  await userModel.deleteOne({ id });
   res.send("Deleted !");
 });
 

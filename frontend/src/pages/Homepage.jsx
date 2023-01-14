@@ -26,14 +26,24 @@ import {
   ModalContent,
 } from "@chakra-ui/react";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteApi, postApi } from "../redux/action";
+import { getdataApi } from "../redux/action";
+import emailjs from "emailjs-com";
 
 const Homepage = () => {
   const [data, setData] = useState([]);
+  const [isChecked, setIsChecked] = useState(true);
+  const [mailData, setmailData] = useState([]);
 
+  console.log(mailData);
   // for modal states
   const { isOpen, onOpen, onClose } = useDisclosure();
   const finalRef = React.useRef(null);
+  const profiles = useSelector((state) => state.profiles);
+
+  const dispatch = useDispatch();
 
   // extracing data from form
   const handleCange = (e) => {
@@ -43,10 +53,44 @@ const Homepage = () => {
   };
 
   const handleSave = (e) => {
-    e.preventDefault();
-    console.log(data);
+    dispatch(postApi(data));
     setData([]);
   };
+
+  // for deleting
+  const handleDelete = (id) => {
+    dispatch(deleteApi(id));
+  };
+  const handleupdate = () => {};
+
+  const handleCheck = (profiles) => {
+    setIsChecked(!isChecked);
+    if (isChecked) {
+      setmailData({ ...mailData, profiles });
+    }
+  };
+
+  const sendEmail = (e) => {
+    emailjs
+      .sendForm(
+        "service_ywu5lvk",
+        "template_9th563y",
+        mailData,
+        "QOmiGUmA2IiTnhdpg"
+      )
+      .then(
+        (result) => {
+          alert(result.text);
+        },
+        (error) => {
+          console.log(error.text);
+        }
+      );
+  };
+
+  useEffect(() => {
+    dispatch(getdataApi());
+  }, [dispatch]);
 
   return (
     <>
@@ -65,6 +109,7 @@ const Homepage = () => {
             size={["xl", "lg", "md"]}
             variant={"outline"}
             colorScheme="teal"
+            onClick={sendEmail}
           >
             Send Data
           </Button>
@@ -157,26 +202,40 @@ const Homepage = () => {
             </Tr>
           </Thead>
           <Tbody>
-            <Tr>
-              <Td>
-                <Checkbox colorScheme="green" />
-              </Td>
-              <Td>1</Td>
-              <Td>Pawan</Td>
-              <Td>9075565252</Td>
-              <Td>pwn@gmail.com</Td>
-              <Td>Chess</Td>
-              <Td>
-                <Button variant="ghost" colorScheme="blue">
-                  Update
-                </Button>
-              </Td>
-              <Td>
-                <Button variant="ghost" colorScheme="red">
-                  Delete
-                </Button>
-              </Td>
-            </Tr>
+            {profiles &&
+              profiles.map((el, i) => (
+                <Tr key={el._id}>
+                  <Td>
+                    <Checkbox
+                      onChange={() => handleCheck(el)}
+                      colorScheme="green"
+                    />
+                  </Td>
+                  <Td>{i + 1}</Td>
+                  <Td>{el.name}</Td>
+                  <Td>{el.no}</Td>
+                  <Td>{el.email}</Td>
+                  <Td>{el.hobbies}</Td>
+                  <Td>
+                    <Button
+                      variant="ghost"
+                      colorScheme="blue"
+                      onClick={handleupdate}
+                    >
+                      Update
+                    </Button>
+                  </Td>
+                  <Td>
+                    <Button
+                      onClick={(e) => handleDelete(el._id)}
+                      variant="ghost"
+                      colorScheme="red"
+                    >
+                      Delete
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
           </Tbody>
         </Table>
       </TableContainer>
