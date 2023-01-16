@@ -27,10 +27,9 @@ import {
 } from "@chakra-ui/react";
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { deleteApi, postApi } from "../redux/action";
-import { getdataApi } from "../redux/action";
-import emailjs from "emailjs-com";
+import emailjs from "@emailjs/browser";
 import axios from "axios";
 
 const Homepage = () => {
@@ -52,32 +51,35 @@ const Homepage = () => {
     setData(payload);
   };
 
-  const handleSave = (e) => {
-    dispatch(postApi(data));
-    fetchData();
+  const handleSave = async (e) => {
+    await dispatch(postApi(data));
+    await fetchData();
     setData([]);
   };
 
   // for deleting
-  const handleDelete = (id) => {
-    dispatch(deleteApi(id));
-    fetchData();
+  const handleDelete = async (id) => {
+    await dispatch(deleteApi(id));
+    await fetchData();
   };
 
-  const sendEmail = (e) => {
+  const sendEmail = () => {
+    var templateParams = {
+      ...mailData.profiles,
+    };
     emailjs
-      .sendForm(
-        "service_ywu5lvk",
-        "template_9th563y",
-        mailData,
+      .send(
+        "service_mcyrban",
+        "template_t9sxzom",
+        templateParams,
         "QOmiGUmA2IiTnhdpg"
       )
       .then(
-        (result) => {
-          alert(result.text);
+        (response) => {
+          console.log("SUCCESS!", response.status, response.text);
         },
-        (error) => {
-          console.log(error.text);
+        (err) => {
+          console.log("FAILED...", err);
         }
       );
   };
@@ -89,9 +91,9 @@ const Homepage = () => {
     }
   };
 
-  const fetchData = () => {
-    axios
-      .get("http://localhost:8080/user")
+  const fetchData = async () => {
+    await axios
+      .get("https://dull-red-gharial-robe.cyclic.app/user")
       .then((res) => setprofiles(res.data.profiles))
       .catch((err) => console.log(err));
   };
@@ -116,7 +118,7 @@ const Homepage = () => {
             size={["xl", "lg", "md"]}
             variant={"outline"}
             colorScheme="teal"
-            // onClick={sendEmail}
+            onClick={sendEmail}
           >
             Send Data
           </Button>

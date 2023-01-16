@@ -4,7 +4,7 @@ import { GET_DATA } from "./actiontypes";
 // fetching data
 export const getdataApi = () => (dispatch) => {
   axios
-    .get("http://localhost:8080/user")
+    .get("https://dull-red-gharial-robe.cyclic.app/user")
     .then((res) => dispatch({ type: GET_DATA, payload: res.data }))
     .catch((err) => console.log(err));
 };
@@ -12,7 +12,7 @@ export const getdataApi = () => (dispatch) => {
 // posting data
 export const postApi = (data) => (dispatch) => {
   axios
-    .post("http://localhost:8080/user", data)
+    .post("https://dull-red-gharial-robe.cyclic.app/user", data)
     .then((res) => alert(res.data.message))
     .catch((err) => console.log(err));
 };
@@ -25,6 +25,6 @@ export const deleteApi = (id) => (dispatch) => {
     },
   };
   axios
-    .delete("http://localhost:8080/user", config)
+    .delete("https://dull-red-gharial-robe.cyclic.app/user", config)
     .catch((err) => console.log(err));
 };

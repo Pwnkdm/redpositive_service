@@ -9,9 +9,7 @@ import { getdataApi } from "./redux/action";
 function App() {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getdataApi());
-  }, [dispatch]);
+  
   return (
     <div className="App">
       <Navbar />
