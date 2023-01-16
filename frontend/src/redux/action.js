@@ -26,6 +26,5 @@ export const deleteApi = (id) => (dispatch) => {
   };
   axios
     .delete("http://localhost:8080/user", config)
-    .then((res) => alert(res.data))
     .catch((err) => console.log(err));
 };

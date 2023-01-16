@@ -1,16 +1,21 @@
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import Footer from "./Componants/Footer";
 import Navbar from "./Componants/Navbar";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { getdataApi } from "./redux/action";
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getdataApi());
+  }, [dispatch]);
   return (
     <div className="App">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Homepage />}></Route>
-      </Routes>
+      <Homepage />
       <Footer />
     </div>
   );

@@ -1,13 +1,4 @@
 import {
-  TableCaption,
-  TableContainer,
-  Tbody,
-  Th,
-  Td,
-  Thead,
-  Tr,
-  Table,
-  Checkbox,
   Button,
   Stack,
   Modal,
@@ -24,6 +15,15 @@ import {
   Textarea,
   useDisclosure,
   ModalContent,
+  TableContainer,
+  TableCaption,
+  Tbody,
+  Th,
+  Td,
+  Thead,
+  Tr,
+  Table,
+  Checkbox,
 } from "@chakra-ui/react";
 
 import React, { useEffect, useState } from "react";
@@ -31,17 +31,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteApi, postApi } from "../redux/action";
 import { getdataApi } from "../redux/action";
 import emailjs from "emailjs-com";
+import axios from "axios";
 
 const Homepage = () => {
   const [data, setData] = useState([]);
   const [isChecked, setIsChecked] = useState(true);
   const [mailData, setmailData] = useState([]);
 
-  console.log(mailData);
   // for modal states
   const { isOpen, onOpen, onClose } = useDisclosure();
   const finalRef = React.useRef(null);
-  const profiles = useSelector((state) => state.profiles);
+  const [profiles, setprofiles] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -54,20 +54,14 @@ const Homepage = () => {
 
   const handleSave = (e) => {
     dispatch(postApi(data));
+    fetchData();
     setData([]);
   };
 
   // for deleting
   const handleDelete = (id) => {
     dispatch(deleteApi(id));
-  };
-  const handleupdate = () => {};
-
-  const handleCheck = (profiles) => {
-    setIsChecked(!isChecked);
-    if (isChecked) {
-      setmailData({ ...mailData, profiles });
-    }
+    fetchData();
   };
 
   const sendEmail = (e) => {
@@ -88,10 +82,23 @@ const Homepage = () => {
       );
   };
 
-  useEffect(() => {
-    dispatch(getdataApi());
-  }, [dispatch]);
+  const handleCheck = (profiles) => {
+    setIsChecked(!isChecked);
+    if (isChecked) {
+      setmailData({ ...mailData, profiles });
+    }
+  };
 
+  const fetchData = () => {
+    axios
+      .get("http://localhost:8080/user")
+      .then((res) => setprofiles(res.data.profiles))
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <>
       <TableContainer w="90%" m={"auto"}>
@@ -109,7 +116,7 @@ const Homepage = () => {
             size={["xl", "lg", "md"]}
             variant={"outline"}
             colorScheme="teal"
-            onClick={sendEmail}
+            // onClick={sendEmail}
           >
             Send Data
           </Button>
@@ -170,10 +177,7 @@ const Homepage = () => {
               </Stack>
             </ModalBody>
 
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={onClose}>
-                Close
-              </Button>
+            <ModalFooter w="60%" gap={2} m="auto">
               <Button
                 onClick={(e) => handleSave(e)}
                 variant="outline"
@@ -181,12 +185,13 @@ const Homepage = () => {
               >
                 Save
               </Button>
+              <Button colorScheme="blue" mr={3} onClick={onClose}>
+                Close
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
         {/* modal ends here  */}
-
-        {/* table starts here  */}
         <Table variant="striped" colorScheme="teal">
           <TableCaption>User Details</TableCaption>
           <Thead>
@@ -197,7 +202,6 @@ const Homepage = () => {
               <Th>Phone No</Th>
               <Th>Email</Th>
               <Th>Hobbies</Th>
-              <Th>Update</Th>
               <Th>Delete</Th>
             </Tr>
           </Thead>
@@ -216,15 +220,7 @@ const Homepage = () => {
                   <Td>{el.no}</Td>
                   <Td>{el.email}</Td>
                   <Td>{el.hobbies}</Td>
-                  <Td>
-                    <Button
-                      variant="ghost"
-                      colorScheme="blue"
-                      onClick={handleupdate}
-                    >
-                      Update
-                    </Button>
-                  </Td>
+
                   <Td>
                     <Button
                       onClick={(e) => handleDelete(el._id)}
@@ -239,7 +235,6 @@ const Homepage = () => {
           </Tbody>
         </Table>
       </TableContainer>
-      {/* table ends here  */}
     </>
   );
 };
